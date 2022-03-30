@@ -1,0 +1,103 @@
+body {
+	background-color: #333;
+	font-family: -apple-system,BlinkMacSystemFont,Segoe UI,Helvetica,Arial,sans-serif,Apple Color Emoji,Segoe UI Emoji;
+	color: bisque;
+	text-align: center;
+}
+button, label {
+	cursor: pointer;
+}
+button, input {
+	font-family: inherit;
+}
+.df {
+	display: flex;
+}
+.dif {
+	display: inline-flex;
+}
+.aic {
+	align-items: center;
+}
+.jcc {
+	justify-content: center;
+}
+.fdc {
+	flex-direction: column;
+}
+.mono {
+	font-family: monospace;
+}
+aside {
+	background-color: #2e3881;
+	border-right: 4px solid;
+	box-sizing: border-box;
+	font-size: 14px;
+	height: 100%;
+	left: 0;
+	min-width: 260px;
+	padding: 20px;
+	position: fixed;
+	text-align: left;
+	top: 0;
+}
+aside section label:not(.check) {
+	display: flex;
+	flex-direction: column;
+}
+aside section label:not(:last-child) {
+	margin-bottom: 15px;
+}
+aside section label span {
+	margin-bottom: 3px;
+}
+aside section:not(:last-child) {
+	border-bottom: 1px solid;
+	padding-bottom: 25px;
+	margin-bottom: 20px;
+}
+aside h3 {
+	margin-top: 0;
+}
+aside input[type="checkbox"] {
+	margin-right: 5px;
+}
+.button-pad {
+	padding: 5px;
+	width: 100%;
+}
+#seed {
+	margin-bottom: 8px;
+}
+#start-game {
+	margin-top: 30px;
+}
+#grid {
+	background-color: white;
+	box-sizing: border-box;
+	flex-direction: column;
+}
+body.grid-visible #grid {
+	border: 4px solid black;
+}
+#grid .row {
+	display: flex;
+}
+#grid .col {
+	border-collapse: collapse;
+	box-sizing: border-box;
+	height: 32px;
+	width: 32px;
+}
+#grid .col.alive {
+	background-color: lightgreen;
+}
+#grid.finished {
+	opacity: 0.5;
+}
+body.show-grid #grid .row:not(:last-child) .col {
+	border-bottom: 1px solid #999;
+}
+body.show-grid #grid .col:not(:last-child) {
+	border-right: 1px solid #999;
+}

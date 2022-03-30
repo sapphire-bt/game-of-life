@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<link rel="stylesheet" href="./styles.css" />
+		<title>Game of Life</title>
+	</head>
+	<body class="show-grid">
+		<aside class="df fdc">
+			<section>
+				<h3>Configuration</h3>
+
+				<label>
+					<span>Grid width</span>
+					<input id="grid-width" type="number" min="16" autocomplete="on" value="32" />
+				</label>
+
+				<label>
+					<span>No. random starting cells</span>
+					<input id="rand-start" type="number" min="1" autocomplete="on" value="100" />
+				</label>
+
+				<label>
+					<span>Tick speed (ms)</span>
+					<input id="tick-speed" type="number" min="50" autocomplete="on" value="150" />
+				</label>
+
+				<label>
+					<span>Seed</span>
+					<input id="seed" class="mono" type="text" placeholder="Enter any numbers (0-9)" value="1234567890" minlength="1" maxlength="16" autocomplete="on" />
+					<button id="rand-seed">Random</button>
+				</label>
+
+				<label class="check">
+					<input id="show-grid" type="checkbox" checked />
+					<span>Show grid</span>
+				</label>
+
+				<label>
+					<button id="start-game" class="button-pad">Start</button>
+				</label>
+
+				<label>
+					<button id="restart-game" class="button-pad" autocomplete="off" disabled>Restart</button>
+				</label>
+			</section>
+
+			<section>
+				<h3>Stats</h3>
+
+				<div class="stat">
+					<p><strong>Generation</strong>: <span id="generation">0</span></p>
+				</div>
+
+				<div class="stat">
+					<p><strong>Living</strong>: <span id="total-living">0</span></p>
+				</div>
+
+				<div class="stat">
+					<p><strong>Dead</strong>: <span id="total-dead">0</span></p>
+				</div>
+			</section>
+		</aside>
+
+		<div id="grid" class="dif"></div>
+
+		<script src="./gol.js"></script>
+		<script>
+			(function() {
+				// Conveniences
+				const $ = (selector) => document[selector[0] === "#" ? "querySelector" : "querySelectorAll"](selector);
+				const intVal = (selector) => parseInt($(selector).value);
+
+				// Controls/elements
+				const grid           = $("#grid");
+				const seedInput      = $("#seed");
+				const randSeedButton = $("#rand-seed");
+				const startButton    = $("#start-game");
+				const restartButton  = $("#restart-game");
+				const statGeneration = $("#generation");
+				const statLiving     = $("#total-living");
+				const statDead       = $("#total-dead");
+
+				// Game of Life class instance
+				let game;
+
+				// Click "Start" button to begin a game
+				startButton.addEventListener("click", function(e) {
+					e.preventDefault();
+
+					// If a game's in progress, pause
+					if (this.classList.contains("game-in-progress")) {
+						game.pause();
+
+						this.classList.remove("game-in-progress");
+						this.classList.add("game-paused");
+						this.textContent = "Resume";
+					}
+
+					// If paused, resume
+					else if (this.classList.contains("game-paused")) {
+						game.resume();
+
+						this.classList.remove("game-paused");
+						this.classList.add("game-in-progress");
+						this.textContent = "Pause";
+					}
+
+					// Start a game
+					else {
+						const width      = intVal("#grid-width");
+						const height     = width;
+						const startCells = intVal("#rand-start");
+						const speed      = intVal("#tick-speed");
+
+						const onTick = function(game) {
+							statGeneration.textContent = game.generation;
+							statLiving.textContent     = game.totalAlive;
+							statDead.textContent       = game.totalDead;
+						}
+
+						const onFinished = function(game) {
+							game.grid.classList.add("finished");
+						}
+
+						game = new GameOfLife({
+							grid           : grid,
+							width          : width,
+							height         : height,
+							startRandCells : startCells,
+							tickSpeed      : speed,
+							onTick         : onTick,
+							onFinished     : onFinished,
+						})
+
+						// Adds border around grid
+						document.body.classList.add("grid-visible");
+
+						// Randomise initial game state
+						game.activateRandomCells(seedInput.value || null);
+
+						game.start();
+
+						this.classList.add("game-in-progress");
+						this.textContent = "Pause";
+
+						restartButton.disabled = false;
+					}
+				})
+
+				// Restart game
+				restartButton.addEventListener("click", function(e) {
+					e.preventDefault();
+
+					if (startButton.classList.contains("game-paused")) {
+						startButton.click();
+					}
+
+					game.clear();
+					game.activateRandomCells(seedInput.value || null);
+					game.start();
+
+					// Remove if previous game finished
+					grid.classList.remove("finished");
+				})
+
+				// Limit manual seed input to decimal numbers
+				seedInput.addEventListener("input", function(e) {
+					this.value = (this.value.match(/[0-9]+/g) || []).join("");
+				})
+
+				// Generate random seed
+				randSeedButton.addEventListener("click", function(e) {
+					e.preventDefault();
+
+					const seed = [];
+
+					for (let i = 0; i < seedInput.maxLength; i++) {
+						seed[i] = Math.floor(Math.random() * 10);
+					}
+
+					seedInput.value = seed.join("").toUpperCase();
+				})
+
+				// Toggle grid
+				$("#show-grid").addEventListener("input", function() {
+					if (this.checked) {
+						document.body.classList.add("show-grid");
+					} else {
+						document.body.classList.remove("show-grid");
+					}
+				})
+			})();
+		</script>
+	</body>
+</html>
